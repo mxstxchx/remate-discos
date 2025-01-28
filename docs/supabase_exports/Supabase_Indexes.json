@@ -1,1 +1,50 @@
-[Content from initial document]
+[
+  {
+    "schema": "public",
+    "table": "reservation_audit_log",
+    "index": "reservation_audit_log_pkey",
+    "definition": "CREATE UNIQUE INDEX reservation_audit_log_pkey ON public.reservation_audit_log USING btree (id)"
+  },
+  {
+    "schema": "public",
+    "table": "reservations",
+    "index": "reservations_pkey",
+    "definition": "CREATE UNIQUE INDEX reservations_pkey ON public.reservations USING btree (id)"
+  },
+  {
+    "schema": "public",
+    "table": "reservations",
+    "index": "reservations_status_idx",
+    "definition": "CREATE INDEX reservations_status_idx ON public.reservations USING btree (status)"
+  },
+  {
+    "schema": "public",
+    "table": "reservations",
+    "index": "reservations_release_status_idx",
+    "definition": "CREATE INDEX reservations_release_status_idx ON public.reservations USING btree (release_id, status)"
+  },
+  {
+    "schema": "public",
+    "table": "user_sessions",
+    "index": "user_sessions_pkey",
+    "definition": "CREATE UNIQUE INDEX user_sessions_pkey ON public.user_sessions USING btree (id)"
+  },
+  {
+    "schema": "public",
+    "table": "releases",
+    "index": "releases_price_idx",
+    "definition": "CREATE INDEX releases_price_idx ON public.releases USING btree (price)"
+  },
+  {
+    "schema": "public",
+    "table": "releases",
+    "index": "releases_condition_idx",
+    "definition": "CREATE INDEX releases_condition_idx ON public.releases USING btree (condition)"
+  },
+  {
+    "schema": "public",
+    "table": "releases",
+    "index": "releases_pkey",
+    "definition": "CREATE UNIQUE INDEX releases_pkey ON public.releases USING btree (id)"
+  }
+]
