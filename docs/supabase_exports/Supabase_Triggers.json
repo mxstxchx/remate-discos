@@ -1,1 +1,17 @@
-[Content copied directly from document #8 (Supabase_Triggers.json)]
+[
+  {
+    "trigger_name": "manage_reservation_queue",
+    "table_name": "reservations",
+    "trigger_definition": "CREATE TRIGGER manage_reservation_queue BEFORE UPDATE ON public.reservations FOR EACH ROW EXECUTE FUNCTION manage_queue_positions()"
+  },
+  {
+    "trigger_name": "check_reservation_trigger",
+    "table_name": "reservations",
+    "trigger_definition": "CREATE TRIGGER check_reservation_trigger BEFORE INSERT OR UPDATE ON public.reservations FOR EACH ROW EXECUTE FUNCTION check_reservation_constraints()"
+  },
+  {
+    "trigger_name": "check_reservation_expiration",
+    "table_name": "reservations",
+    "trigger_definition": "CREATE TRIGGER check_reservation_expiration BEFORE UPDATE ON public.reservations FOR EACH ROW EXECUTE FUNCTION handle_reservation_expiration()"
+  }
+]
