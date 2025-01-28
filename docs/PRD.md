@@ -7,6 +7,9 @@ Web application for browsing and reserving vinyl records from a personal collect
 - Primary: Spanish (Chile) - es-CL
 - Secondary: English (United States) - en-US
 
+## Currency
+All prices in EUR (€) format.
+
 ## Core Features
 
 ### 1. Browse Interface
@@ -18,16 +21,108 @@ Main Layout:
 - Session management modal
 - Cart management modal
 
-[Previous filter components content...]
+Filter Components:
+1. Top Filter Cards:
+   - Artists card with modal
+   - Labels card with modal
+   - Styles card with modal
+   - Multi-select support
+   - Selection counts
+   - Clear functionality
+   - Search bar for each card with dynamic results
+
+2. Sidebar Filters:
+   - Price range slider
+      * Dynamic min/max based on results
+      * Real-time updates
+   - Condition checkboxes
+   - Clear filter options
+   - Sticky positioning
+   - Collapsible filter sections
+
+3. Top Filter Modals:
+   - Search functionality
+   - Multi-select support
+   - Selection preview
+   - Apply/Clear buttons
+
+4. Session management modal
+    - Initial alias modal on first visit
+      * Appears before accessing any content
+      * Simple form for alias input
+      * 30-day session persistence
+      * Language selection (es-CL/en-US)
+      * Stores in both localStorage and cookies
+    - Session tracking
+      * Last active timestamp
+      * Reserved items association
+      * No authentication required
+    - Login and logout capability
+
+5. Cart management modal
+    - Small temporary modal for cart additions
+    - Sliding expandable/collapsable column modal for cart view
 
 ### 2. Release Display
 
 Browse View:
-[Previous content...]
+- Independent scrolling columns
+  * Left: Sticky filter sidebar (25% width)
+  * Right: Scrollable results grid (75% width)
+- Responsive design
+  * Grid adapts to screen size
+  * Mobile-optimized filter view
+- Release cards showing:
+  * Cover image
+  * Title, artists and catno
+  * Label details
+  * Price and condition
+  * Reservation status
+
+Content Sections:
+1. Media Section
+   - Primary image (high resolution)
+   - Secondary image (high resolution)
+   - YouTube video embeds
+   - Compact video layout
+   - Audio player (when required)
+
+2. Information Section
+   - Title and artist(s)
+   - Label and catalog information
+   - Release details (year, country)
+   - Condition and price
+   - Style tags
+   - Tracklist
+     * Track numbers
+     * Titles
+     * Durations
+     * Additional info (when available)
+   - Notes and additional details
+
+3. Reservation Controls
+   - Dynamic CTA button states:
+     * "Reserve Now" (available)
+     * "In Cart" (in_cart)
+     * "Reserved" (reserved)
+     * "Join Waitlist" (in_queue)
+     * "Sold" (sold)
+     * "Expired" (expired)
+   - Price display
+   - Condition badge
+   - Waitlist position (when applicable)
+   - Reservation expiration countdown
 
 ### 3. Cart & Reservations
 Cart Page Layout:
-[Previous content...]
+- List of reserved items
+- Individual item cards showing:
+  * Basic release information
+  * Reserved price
+  * Expiration countdown
+  * Remove option
+- Total items and value
+- WhatsApp checkout button
 
 Reservation System:
 - 7-day hold period
@@ -56,6 +151,11 @@ interface Release {
   price: number
   primary_image: string      // High resolution main image
   secondary_image: string    // Additional high res image
+  images: {
+    src: string
+    blurDataUrl?: string    // For image optimization
+    quality: 'high' | 'low'
+  }[]
   videos: {
     url: string
     title: string
@@ -71,9 +171,9 @@ interface Release {
 interface UserSession {
   id: string
   alias: string
+  preferred_language: 'es-CL' | 'en-US'
   created_at: Date
   last_active: Date
-  preferred_language: 'es-CL' | 'en-US'
   expires_at: Date
 }
 
@@ -86,6 +186,3 @@ interface Reservation {
   reserved_at: Date
   expires_at: Date
 }
-```
-
-[Rest of the document...]
