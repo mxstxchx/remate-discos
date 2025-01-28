@@ -40,4 +40,4 @@
    - Row Level Security (RLS) for data protection
    - Audit logging for admin actions
 
-[Note: Keeping original content intact from here...]
+[... rest of original content unchanged...]
