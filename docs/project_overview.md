@@ -33,8 +33,12 @@
    - Support for multiple devices per alias
    - 30-day session persistence
    - No passwords required
-
-2. **Database Structure**
+2. **Language Support**
+   - Spanish (Chile) - es-CL: Primary
+   - English (US) - en-US: Secondary
+   - Language selection in session modal
+   - Stored in user_sessions table
+3. **Database Structure**
    - PostgreSQL with JSONB for flexible data (labels, artists, styles)
    - Custom functions for complex queries
    - Row Level Security (RLS) for data protection
