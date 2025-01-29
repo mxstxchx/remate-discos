@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { StateCreator, create } from 'zustand';
+import { PersistOptions, createJSONStorage, persist } from 'zustand/middleware';
 import { Language, SessionStore, ViewPreferences } from '../types/session';
 
 const DEFAULT_VIEW_PREFERENCES: ViewPreferences = {
@@ -8,8 +8,13 @@ const DEFAULT_VIEW_PREFERENCES: ViewPreferences = {
   sortOrder: 'desc',
 };
 
+type SessionStorePersist = (
+  config: StateCreator<SessionStore>,
+  options: PersistOptions<SessionStore>
+) => StateCreator<SessionStore>;
+
 export const useSessionStore = create<SessionStore>(
-  persist(
+  (persist as SessionStorePersist)(
     (set, get) => ({
       // State
       alias: null,
