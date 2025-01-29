@@ -14,9 +14,14 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useFilterStore } from '@/stores/filterStore';
-import { fetchFilterOptions } from '@/lib/queries/releaseQueries';
 import { FilterOption } from '@/types';
-import { Search, AlertTriangle, X } from 'lucide-react';
+import { 
+  Search, 
+  AlertTriangle, 
+  User2, 
+  Disc, 
+  Music, 
+} from 'lucide-react';
 
 interface FilterCardProps {
   title: string;
@@ -25,6 +30,7 @@ interface FilterCardProps {
   onSelect: (values: string[]) => void;
   loading?: boolean;
   error?: string | null;
+  icon: React.ReactNode;
 }
 
 function FilterBadge({ 
@@ -63,7 +69,8 @@ function FilterCard({
   selected, 
   onSelect,
   loading,
-  error 
+  error,
+  icon
 }: FilterCardProps) {
   const [search, setSearch] = React.useState('');
   const [selectedItems, setSelectedItems] = React.useState(selected);
@@ -89,9 +96,12 @@ function FilterCard({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Card className="p-4 cursor-pointer hover:bg-accent">
+        <Card className="p-4 cursor-pointer hover:bg-accent flex-1">
           <div className="flex items-center justify-between">
-            <span className="font-medium">{title}</span>
+            <div className="flex items-center gap-2">
+              {icon}
+              <span className="font-medium">{title}</span>
+            </div>
             {selected.length > 0 && (
               <span className="bg-primary text-primary-foreground rounded-full px-2 py-1 text-xs">
                 {selected.length}
@@ -102,7 +112,10 @@ function FilterCard({
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {icon}
+            {title}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="relative">
@@ -203,7 +216,7 @@ export function FilterCards() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <>
       <FilterCard
         title="Artists"
         options={options.artists}
@@ -211,6 +224,7 @@ export function FilterCards() {
         onSelect={setArtists}
         loading={loading}
         error={error}
+        icon={<User2 className="h-4 w-4" />}
       />
       <FilterCard
         title="Labels"
@@ -219,6 +233,7 @@ export function FilterCards() {
         onSelect={setLabels}
         loading={loading}
         error={error}
+        icon={<Disc className="h-4 w-4" />}
       />
       <FilterCard
         title="Styles"
@@ -227,7 +242,8 @@ export function FilterCards() {
         onSelect={setStyles}
         loading={loading}
         error={error}
+        icon={<Music className="h-4 w-4" />}
       />
-    </div>
+    </>
   );
 }
