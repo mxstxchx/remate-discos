@@ -8,13 +8,19 @@ const DEFAULT_VIEW_PREFERENCES: ViewPreferences = {
   sortOrder: 'desc',
 };
 
-type SessionStorePersist = (
+// Define what we want to persist
+interface PersistedState {
+  viewPreferences: ViewPreferences;
+  language: Language;
+}
+
+type SessionPersist = (
   config: StateCreator<SessionStore>,
-  options: PersistOptions<SessionStore>
+  options: PersistOptions<SessionStore, PersistedState>
 ) => StateCreator<SessionStore>;
 
 export const useSessionStore = create<SessionStore>(
-  (persist as SessionStorePersist)(
+  (persist as SessionPersist)(
     (set, get) => ({
       // State
       alias: null,
@@ -84,7 +90,7 @@ export const useSessionStore = create<SessionStore>(
     {
       name: 'remate-session-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
+      partialize: (state): PersistedState => ({
         viewPreferences: state.viewPreferences,
         language: state.language,
       }),
