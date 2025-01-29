@@ -39,14 +39,14 @@ export async function fetchReleases(filters: FilterOptions) {
     }
 
     // Step 2: Apply remaining filters
-    // Filter by artists
+    // Filter by artists (OR logic)
     if (filters.artists?.length) {
-      query = query.contains('artists', filters.artists);
+      query = query.overlaps('artists', filters.artists);
     }
 
-    // Filter by styles
+    // Filter by styles (OR logic)
     if (filters.styles?.length) {
-      query = query.contains('styles', filters.styles);
+      query = query.overlaps('styles', filters.styles);
     }
 
     // Filter by condition
