@@ -57,7 +57,6 @@ export function FilterSidebar() {
               value={[priceRange.min, priceRange.max]}
               onValueChange={handlePriceChange}
               className="w-full"
-              thumbClassName="block h-5 w-5 rounded-full border-2 border-primary bg-white ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             />
             <div className="flex justify-between mt-2 text-sm">
               <span>€{priceRange.min}</span>
