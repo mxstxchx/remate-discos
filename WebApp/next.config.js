@@ -6,10 +6,7 @@ const nextConfig = {
       'localhost',
       // Add Supabase storage domain here once configured
     ],
-  },
-  experimental: {
-    serverActions: true,
-  },
+  }
 }
 
 module.exports = nextConfig
