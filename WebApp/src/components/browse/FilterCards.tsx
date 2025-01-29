@@ -10,24 +10,32 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useFilterStore } from '@/stores/filterStore';
-import { X, Search } from 'lucide-react';
-
-interface FilterOption {
-  value: string;
-  count?: number;
-}
+import { fetchFilterOptions } from '@/lib/queries/releaseQueries';
+import { FilterOption } from '@/types';
+import { Search, AlertTriangle } from 'lucide-react';
 
 interface FilterCardProps {
   title: string;
   options: FilterOption[];
   selected: string[];
   onSelect: (values: string[]) => void;
+  loading?: boolean;
+  error?: string | null;
 }
 
-function FilterCard({ title, options, selected, onSelect }: FilterCardProps) {
+function FilterCard({ 
+  title, 
+  options, 
+  selected, 
+  onSelect,
+  loading,
+  error 
+}: FilterCardProps) {
   const [search, setSearch] = React.useState('');
   const [selectedItems, setSelectedItems] = React.useState(selected);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   // Filter options based on search
   const filteredOptions = options.filter(option =>
@@ -43,10 +51,11 @@ function FilterCard({ title, options, selected, onSelect }: FilterCardProps) {
 
   const handleApply = () => {
     onSelect(selectedItems);
+    setIsOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Card className="p-4 cursor-pointer hover:bg-accent">
           <div className="flex items-center justify-between">
@@ -63,6 +72,7 @@ function FilterCard({ title, options, selected, onSelect }: FilterCardProps) {
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
+
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -72,31 +82,55 @@ function FilterCard({ title, options, selected, onSelect }: FilterCardProps) {
             className="pl-8"
           />
         </div>
-        <ScrollArea className="max-h-[60vh] mt-4">
+
+        {error ? (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        ) : loading ? (
           <div className="space-y-2">
-            {filteredOptions.map(option => (
-              <div
-                key={option.value}
-                onClick={() => handleSelect(option.value)}
-                className={`flex items-center justify-between p-2 rounded-md cursor-pointer ${
-                  selectedItems.includes(option.value)
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-accent'
-                }`}
-              >
-                <span>{option.value}</span>
-                {option.count && (
-                  <span className="text-sm opacity-70">{option.count}</span>
-                )}
-              </div>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-10 bg-muted animate-pulse rounded-md" />
             ))}
           </div>
-        </ScrollArea>
+        ) : (
+          <ScrollArea className="max-h-[60vh] mt-4">
+            <div className="space-y-2">
+              {filteredOptions.map(option => (
+                <div
+                  key={option.value}
+                  onClick={() => handleSelect(option.value)}
+                  className={`flex items-center justify-between p-2 rounded-md cursor-pointer ${
+                    selectedItems.includes(option.value)
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-accent'
+                  }`}
+                >
+                  <span>{option.value}</span>
+                  {option.count && (
+                    <span className="text-sm opacity-70">{option.count}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        )}
+
         <div className="flex justify-end space-x-2 mt-4">
-          <Button variant="outline" onClick={() => setSelectedItems([])}>
+          <Button 
+            variant="outline" 
+            onClick={() => setSelectedItems([])}
+            disabled={loading}
+          >
             Clear
           </Button>
-          <Button onClick={handleApply}>Apply</Button>
+          <Button 
+            onClick={handleApply}
+            disabled={loading}
+          >
+            Apply
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -113,21 +147,34 @@ export function FilterCards() {
     setStyles
   } = useFilterStore();
 
-  // These would come from your Supabase query
-  const [options, setOptions] = React.useState({
-    artists: [] as FilterOption[],
-    labels: [] as FilterOption[],
-    styles: [] as FilterOption[]
+  const [options, setOptions] = React.useState<{
+    artists: FilterOption[];
+    labels: FilterOption[];
+    styles: FilterOption[];
+  }>({
+    artists: [],
+    labels: [],
+    styles: []
   });
 
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
   React.useEffect(() => {
-    // Fetch options from Supabase
-    const fetchOptions = async () => {
-      // TODO: Implement Supabase queries
-      // const { data: artists } = await supabase...
+    const loadFilterOptions = async () => {
+      try {
+        const { data, error } = await fetchFilterOptions();
+        if (error) throw error;
+        if (data) setOptions(data);
+      } catch (e) {
+        setError('Failed to load filter options');
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     };
     
-    fetchOptions();
+    loadFilterOptions();
   }, []);
 
   return (
@@ -137,18 +184,24 @@ export function FilterCards() {
         options={options.artists}
         selected={selectedArtists}
         onSelect={setArtists}
+        loading={loading}
+        error={error}
       />
       <FilterCard
         title="Labels"
         options={options.labels}
         selected={selectedLabels}
         onSelect={setLabels}
+        loading={loading}
+        error={error}
       />
       <FilterCard
         title="Styles"
         options={options.styles}
         selected={selectedStyles}
         onSelect={setStyles}
+        loading={loading}
+        error={error}
       />
     </div>
   );
