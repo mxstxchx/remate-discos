@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useFilterStore } from '@/stores/filterStore';
+import { EuroIcon, Star } from 'lucide-react';
 
 const conditionOptions = [
   { value: 'Mint', label: 'Mint' },
@@ -46,7 +47,10 @@ export function FilterSidebar() {
       {/* Price Range Filter */}
       <Card>
         <CardHeader>
-          <CardTitle>Price Range</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <EuroIcon className="h-4 w-4" />
+            Price Range
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="pt-2">
@@ -69,7 +73,10 @@ export function FilterSidebar() {
       {/* Condition Filter */}
       <Card>
         <CardHeader>
-          <CardTitle>Condition</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-4 w-4" />
+            Condition
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
