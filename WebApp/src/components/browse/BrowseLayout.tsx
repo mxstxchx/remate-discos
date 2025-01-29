@@ -6,8 +6,8 @@ import { ReleaseGrid } from './ReleaseGrid';
 import { FilterCards } from './FilterCards';
 import { NavBar } from '../layout/NavBar';
 import { Button } from '@/components/ui/button';
-import { Menu, SlidersHorizontal } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Filter } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 export function BrowseLayout() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -30,14 +30,18 @@ export function BrowseLayout() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Mobile Filter Button */}
-            <div className="lg:hidden flex justify-end">
+            <div className="lg:hidden">
               <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <SlidersHorizontal className="h-5 w-5" />
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    Price & Condition
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+                  <SheetHeader>
+                    <SheetTitle>Filters</SheetTitle>
+                  </SheetHeader>
                   <div className="py-6">
                     <FilterSidebar />
                   </div>
