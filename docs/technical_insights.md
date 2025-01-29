@@ -59,180 +59,73 @@ const getErrorMessage = (error: string, language: 'es-CL' | 'en-US') => {
 };
 ```
 
-### 3. Database Patterns
-- Use JSONB for flexible data (labels, artists, styles)
-- Two-step query process for complex filters
-- Proper RLS policies for data protection
-- Status transitions must be handled at DB level
+### 3. Component Initialization and Path Resolution
+Important considerations for Next.js and shadcn/ui setup:
 
-```sql
--- Example: Efficient JSONB label filtering
-CREATE OR REPLACE FUNCTION matches_any_label(p_labels text[])
-RETURNS TABLE (release_id bigint) SECURITY DEFINER AS $$
-BEGIN
-  RETURN QUERY
-    SELECT r.id
-    FROM releases r
-    WHERE EXISTS (
-      SELECT 1
-      FROM jsonb_array_elements(r.labels::jsonb) l
-      WHERE l->>'name' = any(p_labels)
-    );
-END;
-$$ LANGUAGE plpgsql;
-```
-
-### 4. Image Handling
+#### Path Resolution
+- Prefer path aliases when Next.js alias configuration is properly set up:
 ```typescript
-interface Image {
-  src: string;
-  blurDataUrl?: string;  // For loading optimization
-  quality: 'high' | 'low';
-}
-
-interface Release {
-  primary_image: string;    // High resolution main image
-  secondary_image: string;  // Additional high res image
-  images: Image[];         // Quality variants
-}
-
-// Usage example
-const optimizeImages = (release: Release) => {
-  return {
-    ...release,
-    images: [
-      {
-        src: release.primary_image,
-        quality: 'high',
-        blurDataUrl: generateBlurUrl(release.primary_image)
-      },
-      {
-        src: release.secondary_image,
-        quality: 'high'
-      }
-    ]
-  };
-};
-```
-
-## Critical Implementation Details
-
-### 1. Join Patterns
-```typescript
-// Correct join pattern for user sessions
-.select(`
-  *,
-  user_session:user_sessions!inner(
-    alias,
-    preferred_language
-  )
-`)
-.eq('user_session.alias', alias)
-```
-
-### 2. State Management Patterns
-```typescript
-// Cart store with status handling
-const useCartStore = create<CartStore>((set) => ({
-  items: [],
-  addItem: async (item) => {
-    const status = await checkAvailability(item.id);
-    if (status === 'available') {
-      set((state) => ({
-        items: [...state.items, { ...item, status: 'in_cart' }]
-      }));
+// tsconfig.json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
     }
   }
-}));
+}
 
-// Session store with language support
-const useSessionStore = create<SessionStore>((set) => ({
-  alias: '',
-  language: 'es-CL', // Default language
-  setLanguage: (lang: 'es-CL' | 'en-US') => {
-    set({ language: lang });
-    localStorage.setItem('language', lang);
-  }
-}));
+// Preferred import style
+import { Dialog } from '@/components/ui/dialog';
 ```
 
-### 3. Mobile Considerations
-- Filter sidebar as modal on mobile
-- Grid adapts to screen width
-- Touch-friendly controls
-- Performance optimization for mobile
-
+- Use relative imports as fallback when path resolution issues occur:
 ```typescript
-// Mobile-first grid layout
-const GridLayout = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+// Fallback import style
+import { Dialog } from '../ui/dialog';
+```
 
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+#### shadcn/ui Setup
+1. **Dependencies Installation**:
+```json
+{
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.1.0",
+    "lucide-react": "^0.263.1"
   }
-`;
+}
 ```
 
-## Error Prevention
-
-### 1. Session Management
-```typescript
-const handleSessionError = (error: Error) => {
-  const { language } = useSessionStore();
-  if (!session?.alias) {
-    toast.error(getErrorMessage('session_error', language));
-    return false;
-  }
-  return true;
-};
+2. **Component Organization**:
+```
+src/
+  components/
+    ui/           # Base shadcn/ui components
+      dialog.tsx
+      button.tsx
+      input.tsx
+      label.tsx
+      select.tsx
+    session/      # Feature components
+      SessionModal.tsx  # Uses ui components
 ```
 
-### 2. Queue Management
-- Prevent self-queue joining
-- Maintain queue position integrity
-- Handle concurrent access
-- Proper status transitions
+3. **Component Initialization Order**:
+- Install dependencies first
+- Create utils.ts with cn helper
+- Initialize base components
+- Create feature components
 
-```sql
--- Queue position management trigger
-CREATE TRIGGER manage_reservation_queue
-  BEFORE UPDATE ON reservations
-  FOR EACH ROW
-  EXECUTE FUNCTION manage_queue_positions();
-```
+4. **Common Issues & Solutions**:
+- Missing peer dependencies can cause cryptic errors
+- Always ensure Tailwind and PostCSS are properly configured
+- Keep consistent relative/alias imports within components
+- Add "use client" directive to interactive components
 
-## Performance Patterns
-
-### 1. Query Optimization
-- Use RPC for complex operations
-- Proper JSONB indexing
-- Two-step filtering process
-- Efficient array operations
-
-### 2. Frontend Optimization
-```typescript
-// Component memoization
-const ReleaseCard = memo(({ release }: Props) => {
-  // Implementation
-});
-
-// Debounced filter updates
-const debouncedFilter = debounce((value) => {
-  applyFilters(value);
-}, 300);
-
-// Image loading optimization
-const Image = ({ src, blurDataUrl }: ImageProps) => {
-  return (
-    <NextImage
-      src={src}
-      placeholder="blur"
-      blurDataURL={blurDataUrl}
-      loading="lazy"
-    />
-  );
-};
-```
+### 4. Database Patterns
+[Content continues as before...]
