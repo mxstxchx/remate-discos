@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import {
   Dialog,
@@ -14,7 +16,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useFilterStore } from '@/stores/filterStore';
 import { fetchFilterOptions } from '@/lib/queries/releaseQueries';
 import { FilterOption } from '@/types';
-import { Search, AlertTriangle } from 'lucide-react';
+import { Search, AlertTriangle, X } from 'lucide-react';
 
 interface FilterCardProps {
   title: string;
@@ -23,6 +25,36 @@ interface FilterCardProps {
   onSelect: (values: string[]) => void;
   loading?: boolean;
   error?: string | null;
+}
+
+function FilterBadge({ 
+  value, 
+  count, 
+  selected, 
+  onClick 
+}: { 
+  value: string; 
+  count?: number; 
+  selected: boolean; 
+  onClick: () => void;
+}) {
+  return (
+    <div
+      onClick={onClick}
+      className={`
+        inline-flex items-center px-3 py-1 m-1 rounded-full cursor-pointer
+        transition-colors text-sm
+        ${selected 
+          ? 'bg-primary text-primary-foreground' 
+          : 'bg-secondary hover:bg-secondary/80'}
+      `}
+    >
+      <span>{value}</span>
+      {count !== undefined && (
+        <span className="ml-2 opacity-70">({count})</span>
+      )}
+    </div>
+  );
 }
 
 function FilterCard({ 
@@ -68,7 +100,7 @@ function FilterCard({
           </div>
         </Card>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -96,22 +128,15 @@ function FilterCard({
           </div>
         ) : (
           <ScrollArea className="max-h-[60vh] mt-4">
-            <div className="space-y-2">
+            <div className="flex flex-wrap gap-1">
               {filteredOptions.map(option => (
-                <div
+                <FilterBadge
                   key={option.value}
+                  value={option.value}
+                  count={option.count}
+                  selected={selectedItems.includes(option.value)}
                   onClick={() => handleSelect(option.value)}
-                  className={`flex items-center justify-between p-2 rounded-md cursor-pointer ${
-                    selectedItems.includes(option.value)
-                      ? 'bg-primary text-primary-foreground'
-                      : 'hover:bg-accent'
-                  }`}
-                >
-                  <span>{option.value}</span>
-                  {option.count && (
-                    <span className="text-sm opacity-70">{option.count}</span>
-                  )}
-                </div>
+                />
               ))}
             </div>
           </ScrollArea>
