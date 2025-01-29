@@ -1,44 +1,42 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useFilterStore } from '@/stores/filterStore';
-
-interface Release {
-  id: number;
-  title: string;
-  artists: string[];
-  labels: {
-    name: string;
-    catno: string;
-  }[];
-  condition: string;
-  price: number;
-  primary_image: string;
-}
+import { fetchReleases } from '@/lib/queries/releaseQueries';
+import { Release } from '@/types';
+import { AlertTriangle } from 'lucide-react';
 
 export function ReleaseGrid() {
   const [releases, setReleases] = React.useState<Release[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const filters = useFilterStore();
 
   React.useEffect(() => {
-    const fetchReleases = async () => {
+    const fetchData = async () => {
       setLoading(true);
+      setError(null);
+      
       try {
-        // TODO: Implement Supabase query using matches_any_label function
-        // const { data, error } = await supabase.rpc('matches_any_label', {
-        //   p_labels: filters.selectedLabels
-        // })
-        
-        // For now, simulate data
-        setReleases([]);
-      } catch (error) {
-        console.error('Error fetching releases:', error);
+        const { data, error } = await fetchReleases({
+          artists: filters.selectedArtists,
+          labels: filters.selectedLabels,
+          styles: filters.selectedStyles,
+          conditions: filters.selectedConditions,
+          priceRange: filters.priceRange
+        });
+
+        if (error) throw error;
+        if (data) setReleases(data);
+      } catch (e) {
+        setError('Failed to load releases. Please try again later.');
+        console.error(e);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchReleases();
+    fetchData();
   }, [filters]); // Re-fetch when filters change
 
   if (loading) {
@@ -54,6 +52,25 @@ export function ReleaseGrid() {
           </Card>
         ))}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (releases.length === 0) {
+    return (
+      <Alert>
+        <AlertDescription>
+          No releases found matching your filters. Try adjusting your search criteria.
+        </AlertDescription>
+      </Alert>
     );
   }
 
@@ -91,7 +108,6 @@ export function ReleaseGrid() {
           {/* Price */}
           <CardFooter className="p-4 pt-0 flex justify-between items-center">
             <span className="font-medium">€{release.price}</span>
-            {/* Additional controls can go here */}
           </CardFooter>
         </Card>
       ))}
