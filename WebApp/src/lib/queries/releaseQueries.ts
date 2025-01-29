@@ -18,6 +18,10 @@ interface FilterOptions {
   };
 }
 
+interface LabelFilterResult {
+  release_id: number;
+}
+
 export async function fetchReleases(filters: FilterOptions) {
   try {
     let query = supabase.from('releases').select('*');
@@ -30,7 +34,7 @@ export async function fetchReleases(filters: FilterOptions) {
         });
 
       if (labelFilteredIds) {
-        query = query.in('id', labelFilteredIds.map(row => row.release_id));
+        query = query.in('id', labelFilteredIds.map((row: LabelFilterResult) => row.release_id));
       }
     }
 
