@@ -115,6 +115,69 @@ const optimizeImages = (release: Release) => {
 };
 ```
 
+### 5. Next.js Component Setup
+Important considerations for Next.js and shadcn/ui implementation:
+
+#### Path Resolution
+Configure path aliases in tsconfig.json:
+```typescript
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+Implement both alias and relative import patterns:
+```typescript
+// Preferred: Path alias imports
+import { Dialog } from '@/components/ui/dialog';
+
+// Fallback: Relative imports when needed
+import { Dialog } from '../ui/dialog';
+```
+
+#### shadcn/ui Dependencies
+Ensure all required dependencies are installed:
+```json
+{
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.1.0",
+    "lucide-react": "^0.263.1"
+  }
+}
+```
+
+#### Component Organization
+Follow this directory structure for clarity:
+```
+src/
+  components/
+    ui/           # Base shadcn/ui components
+      dialog.tsx
+      button.tsx
+      input.tsx
+      label.tsx
+      select.tsx
+    session/      # Feature components
+      SessionModal.tsx
+```
+
+#### Implementation Best Practices
+- Add "use client" directive to all interactive components
+- Keep consistent import patterns within components
+- Initialize base components before feature components
+- Handle path resolution issues gracefully with fallbacks
+- Ensure Tailwind and PostCSS configuration is complete
+
 ## Critical Implementation Details
 
 ### 1. Join Patterns
