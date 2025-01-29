@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -5,6 +7,10 @@ import { useFilterStore } from '@/stores/filterStore';
 import { fetchReleases } from '@/lib/queries/releaseQueries';
 import { Release } from '@/types';
 import { AlertTriangle } from 'lucide-react';
+
+function getDisplayImage(release: Release): string {
+  return release.primary_image || release.secondary_image || '/placeholder.jpg';
+}
 
 export function ReleaseGrid() {
   const [releases, setReleases] = React.useState<Release[]>([]);
@@ -81,7 +87,7 @@ export function ReleaseGrid() {
           {/* Album Cover */}
           <div className="aspect-square relative">
             <img
-              src={release.primary_image || '/placeholder.jpg'}
+              src={getDisplayImage(release)}
               alt={release.title}
               className="object-cover w-full h-full"
             />
