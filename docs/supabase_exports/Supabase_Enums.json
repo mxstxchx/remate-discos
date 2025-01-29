@@ -1,1 +1,30 @@
-[Content of Supabase_Enums.json]
+[
+  {
+    "enum_name": "reservation_status",
+    "enum_value": "available"
+  },
+  {
+    "enum_name": "reservation_status",
+    "enum_value": "in_cart"
+  },
+  {
+    "enum_name": "reservation_status",
+    "enum_value": "reserved"
+  },
+  {
+    "enum_name": "reservation_status",
+    "enum_value": "in_queue"
+  },
+  {
+    "enum_name": "reservation_status",
+    "enum_value": "sold"
+  },
+  {
+    "enum_name": "reservation_status",
+    "enum_value": "expired"
+  },
+  {
+    "enum_name": "reservation_status",
+    "enum_value": "cancelled"
+  }
+]

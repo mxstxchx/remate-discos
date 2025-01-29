@@ -1,25 +1,45 @@
 # Supabase Database Implementation Status
 
-This document captures the current state of Supabase database implementation.
+This document captures the current state of Supabase database implementation. All implementation details are maintained in JSON exports to ensure accuracy and consistency.
 
 ## Implementation Details
 
-Current implementation details are maintained in the following exports:
-
 ### Functions
-All database functions are documented in `supabase_exports/Supabase_Public_Functions.json`
+All database functions are documented in `supabase_exports/Supabase_Public_Functions.json`, including:
+- `matches_any_label` for efficient JSONB filtering
+- `check_reservation_constraints` for status validation
+- Admin functions for reservation management
+- Queue position management functions
 
 ### Triggers
-All database triggers are documented in `supabase_exports/Supabase_Triggers.json`
+Trigger definitions are maintained in `supabase_exports/Supabase_Triggers.json`, including:
+- Queue management triggers
+- Reservation constraint checks
+- Expiration handling
+- Audit logging triggers
 
 ### RLS Policies
-Row Level Security policies are documented in `supabase_exports/Supabase_RLS_Policies.json`
+Row Level Security policies are defined in `supabase_exports/Supabase_RLS_Policies.json`, implementing:
+- Alias-based access control
+- Admin function security
+- Queue position integrity
+- Reservation constraints
 
 ### Indexes
-Database indexes are documented in `supabase_exports/Supabase_Indexes.json`
+Database indexes are specified in `supabase_exports/Supabase_Indexes.json`, optimizing:
+- JSONB searches on labels
+- Queue position queries
+- Status and condition filters
+- Price range searches
 
-### Enums
-Enumerated types are documented in `supabase_exports/Supabase_Enums.json`
+### Status Enums
+Reservation status values are defined in `supabase_exports/Supabase_Enums.json`:
+- 'in_cart': Initial cart addition
+- 'reserved': Active reservation
+- 'in_queue': Waiting list position
+- 'expired': Past 7-day period
+- 'sold': Completed purchase
+- 'cancelled': User cancellation
 
 ## Migration Considerations
 

@@ -1,1 +1,112 @@
-[Content of Supabase_RLS_Policies.json]
+[
+  {
+    "schemaname": "public",
+    "tablename": "reservation_audit_log",
+    "policyname": "Enable read access for admins",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_sessions us\n  WHERE ((us.alias = ( SELECT user_sessions.alias\n           FROM user_sessions\n          WHERE (user_sessions.id = current_user_session_id()))) AND (us.is_admin = true))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reservation_audit_log",
+    "policyname": "Enable write access for admins",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_sessions us\n  WHERE ((us.alias = ( SELECT user_sessions.alias\n           FROM user_sessions\n          WHERE (user_sessions.id = current_user_session_id()))) AND (us.is_admin = true))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reservations",
+    "policyname": "Allow viewing own reservations",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "(user_session_id IN ( SELECT user_sessions.id\n   FROM user_sessions\n  WHERE (user_sessions.alias = ( SELECT user_sessions_1.alias\n           FROM user_sessions user_sessions_1\n          WHERE (user_sessions_1.id = reservations.user_session_id)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reservations",
+    "policyname": "Enable insert for authenticated users",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reservations",
+    "policyname": "Enable select for all users",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reservations",
+    "policyname": "Prevent duplicate alias reservations",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((NOT has_active_reservation(release_id, user_session_id)) OR (status = 'in_queue'::reservation_status))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reservations",
+    "policyname": "Reservations are updatable by session owner",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "UPDATE",
+    "qual": "true",
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_sessions",
+    "policyname": "User sessions are insertable by anyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_sessions",
+    "policyname": "User sessions are viewable by owner",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "releases",
+    "policyname": "Releases are insertable by authenticated users",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "releases",
+    "policyname": "Releases are viewable by everyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  }
+]
