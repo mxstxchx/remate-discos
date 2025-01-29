@@ -1,24 +1,26 @@
+"use client";
+
 import { useEffect, useState } from 'react';
-import { useSessionStore } from '@/stores/sessionStore';
-import { createUserSession } from '@/lib/supabase/session';
-import { Language } from '@/types/session';
+import { useSessionStore } from '../../stores/sessionStore';
+import { createUserSession } from '../../lib/supabase/session';
+import { Language } from '../../types/session';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '../ui/select';
 
 export function SessionModal() {
   const [open, setOpen] = useState(false);

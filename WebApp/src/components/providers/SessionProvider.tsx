@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useSessionStore } from '@/stores/sessionStore';
+import { useSessionStore } from '../../stores/sessionStore';
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
