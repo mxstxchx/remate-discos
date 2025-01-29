@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { StateCreator, create } from 'zustand';
+import { PersistOptions, createJSONStorage, persist } from 'zustand/middleware';
 import { Language, SessionStore, ViewPreferences } from '../types/session';
 
 const DEFAULT_VIEW_PREFERENCES: ViewPreferences = {
@@ -8,8 +8,19 @@ const DEFAULT_VIEW_PREFERENCES: ViewPreferences = {
   sortOrder: 'desc',
 };
 
+// Define what we want to persist
+interface PersistedState {
+  viewPreferences: ViewPreferences;
+  language: Language;
+}
+
+type SessionPersist = (
+  config: StateCreator<SessionStore>,
+  options: PersistOptions<SessionStore, PersistedState>
+) => StateCreator<SessionStore>;
+
 export const useSessionStore = create<SessionStore>(
-  persist(
+  (persist as SessionPersist)(
     (set, get) => ({
       // State
       alias: null,
@@ -79,7 +90,7 @@ export const useSessionStore = create<SessionStore>(
     {
       name: 'remate-session-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
+      partialize: (state): PersistedState => ({
         viewPreferences: state.viewPreferences,
         language: state.language,
       }),
