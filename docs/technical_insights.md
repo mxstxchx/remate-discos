@@ -156,6 +156,93 @@ Ensure all required dependencies are installed:
 }
 ```
 
+### 6. Filter Implementation Patterns
+Best practices learned from browse interface:
+
+#### Mobile Filter Management
+- Use Sheet component for mobile filter drawer:
+```typescript
+<Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+  <SheetTrigger asChild>
+    <Button variant=\"outline\" size=\"sm\" className=\"flex items-center gap-2\">
+      <Filter className=\"h-4 w-4\" />
+      Price & Condition
+    </Button>
+  </SheetTrigger>
+  <SheetContent side=\"left\">
+    <FilterSidebar />
+  </SheetContent>
+</Sheet>
+```
+
+#### Efficient Filter Querying
+Two-step query process for complex filters:
+```typescript
+// Step 1: Get IDs using custom function
+const { data: labelFilteredIds } = await supabase
+  .rpc('matches_any_label', {
+    p_labels: filters.labels
+  });
+
+// Step 2: Apply remaining filters
+let query = supabase.from('releases')
+  .select('*')
+  .in('id', labelFilteredIds.map(row => row.release_id));
+
+// Additional filters using overlaps for OR conditions
+if (filters.artists?.length) {
+  query = query.overlaps('artists', filters.artists);
+}
+```
+
+#### Filter UI Components
+Tag-style multi-select implementation:
+```typescript
+function FilterBadge({ 
+  value, 
+  count, 
+  selected, 
+  onClick 
+}: FilterBadgeProps) {
+  return (
+    <div
+      onClick={onClick}
+      className={`
+        inline-flex items-center px-3 py-1 m-1 rounded-full cursor-pointer
+        transition-colors text-sm
+        ${selected 
+          ? 'bg-primary text-primary-foreground' 
+          : 'bg-secondary hover:bg-secondary/80'}
+      `}
+    >
+      <span>{value}</span>
+      {count && <span className=\"ml-2 opacity-70\">({count})</span>}
+    </div>
+  );
+}
+```
+
+#### Layout Composition
+75/25 split with proper content alignment:
+```typescript
+<div className=\"container mx-auto px-4\">
+  {/* Filter Cards Row - Aligned with main content */}
+  <div className=\"lg:w-3/4 lg:ml-auto\">
+    <FilterCards />
+  </div>
+  
+  {/* Main Content */}
+  <div className=\"flex flex-col lg:flex-row gap-6\">
+    <aside className=\"lg:w-1/4\">
+      <FilterSidebar />
+    </aside>
+    <main className=\"lg:w-3/4\">
+      <ReleaseGrid />
+    </main>
+  </div>
+</div>
+```
+
 #### Component Organization
 Follow this directory structure for clarity:
 ```
@@ -297,5 +384,10 @@ const Image = ({ src, blurDataUrl }: ImageProps) => {
       loading="lazy"
     />
   );
+};
+
+// Image fallback handling
+const getDisplayImage = (release: Release): string => {
+  return release.primary_image || release.secondary_image || '/placeholder.jpg';
 };
 ```
