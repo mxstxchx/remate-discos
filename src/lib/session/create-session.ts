@@ -2,16 +2,12 @@ import { Database } from '@/types/supabase';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { SessionError, SessionErrorCode } from './types';
 
-const DEBUG_PREFIX = '[DEV] createUserSession:';
 const LOG_PREFIX = '[APP] Session:';
 
 export async function createUserSession(alias: string, isAdmin = false) {
-  console.log(`${DEBUG_PREFIX} Starting session creation`, { alias, isAdmin });
-  
   const supabase = createClientComponentClient<Database>();
   
   try {
-    // Check existing sessions first
     const { data: existingSessions, error: queryError } = await supabase
       .from('user_sessions')
       .select('id, alias, is_admin')
@@ -28,13 +24,11 @@ export async function createUserSession(alias: string, isAdmin = false) {
       );
     }
 
-    // Return existing session if found
     if (existingSessions?.id) {
       console.log(`${LOG_PREFIX} Using existing session:`, existingSessions.id);
       return existingSessions.id;
     }
 
-    // Create new session
     const { data: newSession, error: insertError } = await supabase
       .from('user_sessions')
       .insert({
