@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { SessionError } from '@/lib/session/types';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 
@@ -28,22 +27,18 @@ export function SessionErrorBoundary({ children }: Props) {
       const errorMessages = {
         QUERY_ERROR: 'Error retrieving session data',
         INSERT_ERROR: 'Unable to create session',
-        ADMIN_AUTH_ERROR: 'Admin access denied - contact support',
+        ADMIN_AUTH_ERROR: 'Admin access denied',
         UNKNOWN_ERROR: 'Unexpected session error'
       };
 
       toast({
         variant: 'destructive',
         title: 'Session Error',
-        description: errorMessages[error.code] || error.message,
-        action: error.code === 'ADMIN_AUTH_ERROR' ? {
-          label: 'Try Again',
-          onClick: () => router.push('/login')
-        } : undefined
+        description: errorMessages[error.code] || error.message
       });
 
       if (error.code === 'ADMIN_AUTH_ERROR') {
-        router.push('/login');
+        router.push('/');
       }
     };
 
