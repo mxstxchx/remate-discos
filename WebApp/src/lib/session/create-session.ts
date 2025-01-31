@@ -8,12 +8,15 @@ export async function createUserSession(alias: string, isAdmin = false) {
   const supabase = createClientComponentClient<Database>();
   
   try {
-    const { data: existingSessions, error: queryError } = await supabase
+    // Get most recent session if exists
+    const { data: existingSession, error: queryError } = await supabase
       .from('user_sessions')
       .select('id, alias, is_admin')
       .eq('alias', alias)
       .eq('is_admin', isAdmin)
-      .maybeSingle();
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
 
     if (queryError) {
       console.log(`${LOG_PREFIX} Query error:`, queryError);
@@ -24,9 +27,9 @@ export async function createUserSession(alias: string, isAdmin = false) {
       );
     }
 
-    if (existingSessions?.id) {
-      console.log(`${LOG_PREFIX} Using existing session:`, existingSessions.id);
-      return existingSessions.id;
+    if (existingSession?.id) {
+      console.log(`${LOG_PREFIX} Using existing session:`, existingSession.id);
+      return existingSession.id;
     }
 
     const { data: newSession, error: insertError } = await supabase
