@@ -5,6 +5,12 @@ export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   const hasSession = request.cookies.has('session_id');
   const isSessionPage = request.nextUrl.pathname === '/session';
+  const isTestPage = request.nextUrl.pathname === '/test';
+
+  // Allow test page during development
+  if (isTestPage) {
+    return response;
+  }
 
   // If we're on the session page and have a session, redirect to home
   if (isSessionPage && hasSession) {
