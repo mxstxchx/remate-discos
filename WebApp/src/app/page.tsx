@@ -1,23 +1,33 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+'use client';
 
-export default async function Home() {
-  const supabase = createServerComponentClient({ cookies });
-  
-  const { data: releases, error } = await supabase
-    .from('releases')
-    .select('*');
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
-  if (error) {
-    console.error('[APP] Failed to load releases:', error);
-  }
+export default function Home() {
+  const [releases, setReleases] = useState([]);
 
-  console.log('[APP] Loaded releases:', releases?.length || 0);
+  useEffect(() => {
+    async function loadReleases() {
+      const { data, error } = await supabase
+        .from('releases')
+        .select('*');
+
+      if (error) {
+        console.error('[APP] Failed to load releases:', error);
+        return;
+      }
+
+      console.log('[APP] Loaded releases:', data?.length || 0);
+      setReleases(data || []);
+    }
+
+    loadReleases();
+  }, []);
 
   return (
     <main className="container mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        {releases?.map((release) => (
+        {releases.map((release) => (
           <div 
             key={release.id} 
             className="p-4 border rounded-lg shadow bg-card"
