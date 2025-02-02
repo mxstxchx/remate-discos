@@ -1,50 +1,60 @@
 'use client';
 
-import { useEffect } from 'react';
-import { SessionError } from '@/lib/session/types';
-import { useToast } from '@/components/ui/use-toast';
-import { useRouter } from 'next/navigation';
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useSessionStore } from '@/stores/session';
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export function SessionErrorBoundary({ children }: Props) {
-  const { toast } = useToast();
-  const router = useRouter();
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
 
-  useEffect(() => {
-    const handleError = (event: ErrorEvent) => {
-      const error = event.error;
+export class SessionErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
+    error: null,
+  };
+
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Session error:', error, errorInfo);
+    
+    // Clear session on critical errors
+    const sessionStore = useSessionStore.getState();
+    if (sessionStore.sessionId) {
+      sessionStore.clearSession();
+    }
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      const { language } = useSessionStore.getState();
       
-      if (!(error instanceof SessionError)) return;
+      return (
+        <Alert variant="destructive">
+          <AlertTitle>
+            {language === 'es-CL' 
+              ? 'Error de sesión' 
+              : 'Session Error'
+            }
+          </AlertTitle>
+          <AlertDescription>
+            {language === 'es-CL'
+              ? 'Hubo un problema con tu sesión. Por favor recarga la página.'
+              : 'There was a problem with your session. Please refresh the page.'
+            }
+          </AlertDescription>
+        </Alert>
+      );
+    }
 
-      console.log('[APP] Session Error:', { 
-        code: error.code, 
-        message: error.message
-      });
-
-      const errorMessages = {
-        QUERY_ERROR: 'Error retrieving session data',
-        INSERT_ERROR: 'Unable to create session',
-        ADMIN_AUTH_ERROR: 'Admin access denied',
-        UNKNOWN_ERROR: 'Unexpected session error'
-      };
-
-      toast({
-        variant: 'destructive',
-        title: 'Session Error',
-        description: errorMessages[error.code] || error.message
-      });
-
-      if (error.code === 'ADMIN_AUTH_ERROR') {
-        router.push('/');
-      }
-    };
-
-    window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
-  }, [toast, router]);
-
-  return <>{children}</>;
+    return this.props.children;
+  }
 }
