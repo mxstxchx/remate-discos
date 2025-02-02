@@ -1,25 +1,31 @@
-import { SessionErrorBoundary } from '@/components/session/SessionErrorBoundary';
+import { Inter } from 'next/font/google';
+import '@/app/globals.css';
+import { SessionProvider } from '@/components/session/SessionProvider';
 import { Toaster } from '@/components/ui/toaster';
-import { ThemeProvider } from '@/components/theme/theme-provider';
 
-export default function RootLayout({
-  children,
-}: {
+const inter = Inter({ subsets: ['latin'] });
+
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export const metadata = {
+  title: 'Remate Discos',
+  description: 'Vinyl marketplace and reservation system',
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider 
-          attribute="class" 
-          defaultTheme="system" 
-          enableSystem
-        >
-          <SessionErrorBoundary>
-            {children}
-          </SessionErrorBoundary>
-          <Toaster />
-        </ThemeProvider>
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body className={inter.className}>
+        <SessionProvider>
+          {children}
+        </SessionProvider>
+        <Toaster />
       </body>
     </html>
   );
