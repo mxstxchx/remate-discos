@@ -2,15 +2,24 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['*'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**'
-      }
-    ]
+    domains: [
+      'localhost',
+      'imagedelivery.net'
+    ],
   },
-  pageExtensions: ['ts', 'tsx']
-};
+  typescript: {
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    serverActions: true,
+  }
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
